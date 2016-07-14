@@ -133,11 +133,11 @@ var vm = new Vue({
         },
 
         selectAllRoutes: function(){
-            $('.toggleRoute').removeAttr('checked');
+            $('.toggleRoute').prop('checked', false);
             $('.toggleRoute').click();
         },
         selectNoRoutes: function(){
-            $('.toggleRoute').attr('checked', 'checked');
+            $('.toggleRoute').prop('checked', true);
             $('.toggleRoute').click();
         },
 
