@@ -5,7 +5,7 @@ var vm = new Vue({
         results: {},
         buses: {},
         routes: {},
-        toggledRoutes: {}
+        shownRoutes: []
     },
     ready: function() {
         this.initMap();
@@ -14,6 +14,11 @@ var vm = new Vue({
         this.$watch("results", function(val) {
             if (this.results)
                 this.updateMap();
+        });
+        // watch the toggled routes and update accordingly
+        this.$watch("shownRoutes", function(val) {
+            if (this.shownRoutes)
+                this.toggleRoutes();
         });
 
     },
@@ -61,13 +66,15 @@ var vm = new Vue({
 
                 var buses = xml.documentElement.getElementsByTagName("vehicle");
                 _this.results=buses;
-
             });
             this.timer = setTimeout(this.updateResults, 15000);
         },
 
-        updateRouteToggles: function() {
-            console.log(event, this.routes)
+        toggleRoutes: function() {
+            $('.bus_marker').hide();
+            for(var route in this.shownRoutes){
+                $('.route_'+this.shownRoutes[route]).show();
+            }
         },
 
         /*
@@ -83,21 +90,32 @@ var vm = new Vue({
                 var id = bus.getAttribute('id');
                 var routeTag = bus.getAttribute('routeTag');
                 var speed = bus.getAttribute('speedKmHr');
+                var secs = bus.getAttribute('secsSinceReport')
+                var wrapper = $('#route_toggles .list-group');
 
+                // add the route layer
                 if(!(routeTag in vm.routes)){
                     vm.routes[routeTag] = L.featureGroup([]).addTo(_this.map);
+                    var checked = (routeTag in vm.shownRoutes) ? "checked" : "";
+
+                    wrapper.append("<li class='list-group-item'><span class='badge' id='bus_count_"+routeTag+"'>"+parseInt(1)+" buses</span><input type='checkbox' class='toggleRoute' value='"+routeTag+"' checked v-model='shownRoutes'/><b>"+routeTag+"</b></li>");
+                    this.$compile(wrapper.get(0));
+                } else {
+                    var buses = Object.keys(vm.routes[routeTag]._layers).length;
+                    $('#bus_count_'+routeTag).text(buses+' buses');
                 }
 
+                // Add or update the marker
                 if(id in vm.buses){
                     vm.buses[id].setLatLng(latlng);
                     vm.buses[id].setStyle({
                         color: vm._getColor(speed),
                         fillColor: vm._getColor(speed)
                     });
+                    vm.buses[id]._popup.setContent(this._buildPopup(id, routeTag, speed, secs));
                     vm.buses[id]._popup.setLatLng(latlng);
                 } else {
-                    var speedClass = (parseInt(speed) === 0 ) ? "text-danger" : "text-success";
-
+                    // add the marker
                     vm.buses[id] = L.circle(latlng, 50, {
                         id: id,
                         color: vm._getColor(speed),
@@ -106,42 +124,31 @@ var vm = new Vue({
                         className: "bus_marker route_"+routeTag+" bus_"+id,
                         title: "Bus #"+id
                     })
-                    .bindPopup("<dl>"+
-                        "<dt>Bus #</dt><dd>"+id+"</dd>"+
-                        "<dt>Route</dt><dd>"+routeTag+"</dd>"+
-                        "<dt>Speed</dt><dd class='"+speedClass+"'>"+speed+" km/h"+"</dd>"+
-                        "<dt>Last Updated</dt><dd>"+bus.getAttribute('secsSinceReport')+"s ago</dd>"+
-                        "</dl>"+
-                        "<button class='btn btn-default btn-xs btn-block toggle-route' onclick='vm.toggleRoute(\""+routeTag+"\")'>Toggle Route</button>"+
-                        "<button class='btn btn-default btn-xs btn-block hide-except' onclick='vm.hideExcept(\""+routeTag+"\")'>Hide Other Routes</button>"+
-                        "<button class='btn btn-default btn-xs btn-block show-all' onclick='vm.showAll()'>Show All Routes</button>"
-                    );
-                    
+                    .bindPopup(this._buildPopup(id, routeTag, speed, secs));
                     vm.buses[id].addTo(vm.routes[routeTag]);
                 }
-
             }
-            vm._updateRouteToggles();
+
+            vm.toggleRoutes();
         },
 
-        toggleRoute: function(routeTag){
-            $('.route_'+routeTag).toggle();
+        selectAllRoutes: function(){
+            $('.toggleRoute').removeAttr('checked');
+            $('.toggleRoute').click();
         },
-        hideExcept: function(routeTag){
-            $('.bus_marker:not(.route_'+routeTag+')').hide();
-            $('.route_'+routeTag).show();
-        },
-        showAll: function(){
-            $('.bus_marker').show();
+        selectNoRoutes: function(){
+            $('.toggleRoute').attr('checked', 'checked');
+            $('.toggleRoute').click();
         },
 
-        _updateRouteToggles: function(){
-            var wrapper = $('#route_toggles');
-            for(var routeTag in vm.routes){
-                var buses = Object.keys(vm.routes[routeTag]._layers).length;
-                console.log(buses)
-                wrapper.append("<li class='list-group-item'><span class='badge'>"+parseInt(buses)+" buses</span><input type='checkbox' name='toggleRoute' value='"+routeTag+"' checked/><b>"+routeTag+"</b></li>")
-            }
+        _buildPopup: function(id, routeTag, speed, secs){
+            var speedClass = (parseInt(speed) === 0 ) ? "text-danger" : "text-success";
+            return "<dl>"+
+            "<dt>Bus #</dt><dd>"+id+"</dd>"+
+            "<dt>Route</dt><dd>"+routeTag+"</dd>"+
+            "<dt>Speed</dt><dd class='"+speedClass+"'>"+speed+" km/h"+"</dd>"+
+            "<dt>Last Updated</dt><dd>"+secs+"s ago</dd>"+
+            "</dl>"
         },
 
         // get color based on speed
