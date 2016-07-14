@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, Response
 import os
+import httplib2
 
 app = Flask(__name__)
 
@@ -9,7 +10,10 @@ def index():
 
 @app.route('/update')
 def update():
-	return "Updates will go here..."
+  resp, content = httplib2.Http().request("http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&t=1144953500233")
+  print(resp)
+  print(content)
+  return Response(content, mimetype='application.xml')
 
 # start the server
 if __name__ == '__main__':

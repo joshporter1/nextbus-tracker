@@ -56,7 +56,7 @@ var vm = new Vue({
             var _this = this;
             clearTimeout(this.timer);
 
-            d3.xml('http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&t=1144953500233', 'application/xml', function(error, xml){
+            d3.xml('/update', 'application/xml', function(error, xml){
                 if(error) throw error;
 
                 var buses = xml.documentElement.getElementsByTagName("vehicle");
