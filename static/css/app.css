@@ -1,3 +1,5 @@
 body { padding-top: 70px; }
 
-#nextmap { height: 500px; }
+#nextmap { min-height: 500px; }
+
+.bus_marker { transition: all .5s; }

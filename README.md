@@ -1,23 +1,23 @@
-ThousandEyes Frontend Coding Challenge:
+# Nextbus Tracker
 
-For this project, you will be using d3.js (http://d3js.org) to draw the real-time positions of San Francisco's buses and trains (SF Muni).
+An app designed to map out SF buses using the Nextbus API.
 
-1. First of all, you will need a base map of San Francisco. This zip file contains a few different versions in GeoJSON format:
-http://downloads.thousandeyes.com/challenge/sfmaps.zip 
+### Getting Started
+#### Requirements
+* Python 2.7
+* pip
 
-2. You should draw the vehicle locations on top of the map, dynamically updating their locations every 15 seconds. The instructions for using the real-time data feed are here:
-http://www.nextbus.com/xmlFeedDocs/NextBusXMLFeed.pdf
+#### Installation
+1. Clone the repo. `git clone https://github.com/joshporter1/nextbus-tracker.git`
+2. Enter the directory. `cd nextbus-tracker`
+3. Install necessary packages. `pip install -r requirements.txt`
+4. Run the server. `python app.py`
+5. Navigate to `localhost:5000` in a modern web browser.
 
-Feel free to get creative with how you draw the vehicles, how you transition them to their latest positions, what other data you incorporate besides the coordinates, and so on.
+### Future Enhancements
 
-3. Provide a separate HTML control for selecting a subset of routes (the "routeTag" attribute in the data), e.g. show only "N" and "6".
+These are some features/functions that I would have liked to add or improve on if I had more time to polish the final product.
 
-Feel free to add any additional controls or interactive elements you think might be useful.
-
-In addition to d3, you are also welcome to use AngularJS (including AngularUI), JQuery, and/or Bootstrap.
-
-Note that the NextBus server allows AJAX requests from all origins, so you can fetch the data directly from your JavaScript code.
-
-Before submitting your source code, keep in mind that we will be reviewing your submission not just for completeness, but for code quality as well.
-
-We strongly suggest you host the app in the cloud so we can test it easily.
+* Better UI for toggling routes
+* Make it more mobile-friendly
+* Better icons. Used circles for cleanliness, but actual bus icons would be nice (but clutters easily).
