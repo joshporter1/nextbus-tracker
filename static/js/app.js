@@ -44,11 +44,11 @@ var vm = new Vue({
             // get map features
             d3.json('/static/geojson/arteries.json', function(error, collection) {
                 if (error) throw error;
-                addFeatures(collection, "artery");
+                addFeatures(collection, "artery", 2);
             });
             d3.json('/static/geojson/freeways.json', function(error, collection) {
                 if (error) throw error;
-                addFeatures(collection, "freeway");
+                addFeatures(collection, "freeway", 3);
             });
 
             this.updateResults();
@@ -164,7 +164,7 @@ var vm = new Vue({
 *   collection - GeoJSON containing the roads
 *   cname - className to separate arteries from freeways
 */
-function addFeatures(collection, cname) {
+function addFeatures(collection, cname, roadWidth) {
     var path = d3.geo.path().projection(vm.transform);
 
     // draw the geoJSON paths
@@ -174,7 +174,7 @@ function addFeatures(collection, cname) {
         .append("path")
             .attr({
                 'class': cname,
-                'stroke-width': 3,
+                'stroke-width': roadWidth,
                 'stroke': '#2196F3',
                 'fill': 'none'
             });
